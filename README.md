@@ -6,7 +6,7 @@
 
 ## Introduction
 This repo is official **[PyTorch](https://pytorch.org)** implementation of **[DeepHandMesh: A Weakly-Supervised Deep Encoder-Decoder Framework for High-Fidelity Hand Mesh Modeling (ECCV 2020. Oral.)](https://arxiv.org/abs/2008.08213)**. 
-* Currently, RGB images of the dataset are not prepared yet becasue of the inspection on private identity information (e.g., fingerprints). Several factors, such as the pandemic, make the inspection take much longer than we expected. Sorry for the late release.
+* Currently, RGB images of the dataset are not prepared yet because of the inspection on private identity information (e.g., fingerprints). Several factors, such as the pandemic, make the inspection take much longer than we expected. Sorry for the late release.
 * Instead, pre-trained DeepHandMeshes are available. You can run demo codes by manually adjusting hand joint euler angles.
 
 ## Demo
