@@ -6,18 +6,16 @@
 
 ## Introduction
 This repo is official **[PyTorch](https://pytorch.org)** implementation of **[DeepHandMesh: A Weakly-Supervised Deep Encoder-Decoder Framework for High-Fidelity Hand Mesh Modeling (ECCV 2020. Oral.)](https://arxiv.org/abs/2008.08213)**. 
-* Currently, RGB images of the dataset are not prepared yet because of the inspection on private identity information (e.g., fingerprints). Several factors, such as the pandemic, make the inspection take much longer than we expected. Sorry for the late release.
-* Instead, pre-trained DeepHandMeshes are available. You can run demo codes by manually adjusting hand joint euler angles.
 
 ## Demo
 * Download pre-trained DeepHandMesh from [here](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing) and place it at `demo` folder, where the filename is `snapshot_${EPOCH}.pth.tar`.
 * Download hand model from [here](https://drive.google.com/file/d/1GTtkyuuIHbo188L0_d8DAmuJukoG-luJ/view?usp=sharing) and place it at `data` folder.
+* Set hand joint Euler angles at [here](https://github.com/facebookresearch/DeepHandMesh/blob/508119e288ef35d4160043e5d3d174d2bf0d1873/demo/demo.py#L73).
 * Run `python demo.py --gpu 0 --test_epoch ${EPOCH}`.
 
 ## DeepHandMesh dataset (RGB images are not prepared yet)
 * For the **DeepHandMesh dataset download and instructions**, go to [[HOMEPAGE](https://mks0601.github.io/DeepHandMesh/)]. 
 * Belows are instructions for DeepHandMesh for the weakly-supervised high-fidelity 3D hand mesh modeling.
-
 
 ## Directory
 ### Root
