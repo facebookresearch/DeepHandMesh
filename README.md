@@ -67,7 +67,7 @@ ${ROOT}
 ### Start
 * In the `main/config.py`, you can change settings of the model
 
-### Train (Not available until the dataset is ready.)
+### Train
 In the `main` folder, run
 ```bash
 python train.py --gpu 0-3
@@ -75,7 +75,7 @@ python train.py --gpu 0-3
 to train the network on the GPU 0,1,2,3. `--gpu 0,1,2,3` can be used instead of `--gpu 0-3`. You can use `--continue` to resume the training.
 
 
-### Test (Not available until the dataset is ready.)
+### Test
 Place trained model at the `output/model_dump/`.
 
 In the `main` folder, run 
@@ -86,6 +86,7 @@ to test the network on the GPU 0,1,2,3 with `snapshot_4.pth.tar`. `--gpu 0,1,2,3
 
 ## Results  
 Here I report results of DeepHandMesh and pre-trained DeepHandMesh.
+
 ### Pre-trained DeepHandMesh
 * Pre-trained DeepHandMesh [[Download](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing)]
 
