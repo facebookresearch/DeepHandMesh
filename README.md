@@ -106,6 +106,7 @@ python test.py --gpu 0-3 --test_epoch 4 --subject 4
 ```
 to test the network on the GPU 0,1,2,3 with `snapshot_4.pth.tar`. `--gpu 0,1,2,3` can be used instead of `--gpu 0-3`.  
 Only subject 4 is supported for the testing.
+It will save images and output meshes.
 
 ## Results  
 Here I report results of DeepHandMesh and pre-trained DeepHandMesh.
