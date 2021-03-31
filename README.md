@@ -98,7 +98,7 @@ Only subject 4 is supported for the training.
 
 
 ### Test
-Place trained model at the `output/model_dump/`.
+Place trained model at the `output/model_dump/subject_${SUBJECT_IDX}`.
 
 In the `main` folder, run 
 ```bash
