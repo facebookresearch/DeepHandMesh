@@ -18,6 +18,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=str, dest='gpu_ids')
     parser.add_argument('--test_epoch', type=str, dest='test_epoch')
+    parser.add_argument('--subject', type=str, dest='subject')
     args = parser.parse_args()
 
     if not args.gpu_ids:
@@ -30,13 +31,13 @@ def parse_args():
         args.gpu_ids = ','.join(map(lambda x: str(x), list(range(*gpus))))
 
     assert args.test_epoch, 'Test epoch is required.'
-
+    assert args.subject == '4', 'Testing only supports subject_4'
     return args
 
 def main():
 
     args = parse_args()
-    cfg.set_args(args.gpu_ids)
+    cfg.set_args(args.subject, args.gpu_ids)
     cudnn.benchmark = True
 
     tester = Tester(args.test_epoch)
@@ -52,9 +53,10 @@ def main():
             vis = True
             if vis:
                 filename = str(itr)
-                for bid in range(len(out['geo_out_refined'])):
-                    tester.mesh.save_obj(out['mesh_refined'][bid].cpu().numpy(), None, filename + '_template_refined.obj')
-                    tester.mesh.save_obj(out['geo_out_refined'][bid].cpu().numpy(), None, filename + '_refined.obj')
+                for bid in range(len(out['mesh_out_refined'])):
+                    img = inputs['img'][bid].detach().cpu().numpy().transpose(1,2,0)[:,:,::-1]*255
+                    cv2.imwrite(filename + '.jpg', img)
+                    tester.mesh.save_obj(out['mesh_out_refined'][bid].cpu().numpy(), None, filename + '_refined.obj')
         
 if __name__ == "__main__":
     main()

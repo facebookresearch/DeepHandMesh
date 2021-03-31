@@ -28,6 +28,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=str, dest='gpu_ids')
     parser.add_argument('--test_epoch', type=str, dest='test_epoch')
+    parser.add_argument('--subject', type=str, dest='subject')
     args = parser.parse_args()
 
     if not args.gpu_ids:
@@ -40,11 +41,12 @@ def parse_args():
         args.gpu_ids = ','.join(map(lambda x: str(x), list(range(*gpus))))
 
     assert args.test_epoch, 'Test epoch is required.'
+    assert args.subject, 'Testing subject is required'
     return args
 
 # argument parsing
 args = parse_args()
-cfg.set_args(args.gpu_ids)
+cfg.set_args(args.subject, args.gpu_ids)
 cudnn.benchmark = True
 
 # hand model settings
@@ -61,7 +63,7 @@ mesh.load_global_pose(osp.join(hand_model_path, 'global_pose.txt'))
 mesh.load_global_pose_inv(osp.join(hand_model_path, 'global_pose_inv.txt')) 
 
 # load pre-trained DeepHandMesh
-model_path = './snapshot_' + args.test_epoch + '.pth.tar'
+model_path = './subject_' + args.subject + '/snapshot_' + args.test_epoch + '.pth.tar'
 assert os.path.exists(model_path), 'Cannot find model at ' + model_path
 model = get_model('test', mesh, root_joint_idx, align_joint_idx, non_rigid_joint_idx)
 model = DataParallel(model).cuda()

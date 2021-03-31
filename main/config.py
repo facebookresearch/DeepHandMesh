@@ -54,12 +54,18 @@ class Config:
     num_gpus = 1
     continue_train = False
 
-    def set_args(self, gpu_ids, continue_train=False):
+    def set_args(self, subject, gpu_ids, continue_train=False):
+        self.subject = subject
         self.gpu_ids = gpu_ids
         self.num_gpus = len(self.gpu_ids.split(','))
         self.continue_train = continue_train
         os.environ["CUDA_VISIBLE_DEVICES"] = self.gpu_ids
         print('>>> Using GPU: {}'.format(self.gpu_ids))
+        
+        self.model_dir = osp.join(self.model_dir, 'subject_' + str(self.subject))
+        self.vis_dir = osp.join(self.vis_dir, 'subject_' + str(self.subject))
+        self.log_dir = osp.join(self.log_dir, 'subject_' + str(self.subject))
+        self.result_dir = osp.join(self.result_dir, 'subject_' + str(self.subject))
 
 cfg = Config()
 

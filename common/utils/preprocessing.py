@@ -27,8 +27,7 @@ def load_img(path, order='RGB'):
     return img
 
 def load_krt(path):
-    """Load KRT file containing intrinsic and extrinsic parameters for Mugsy
-    cameras."""
+    # Load KRT file containing intrinsic and extrinsic camera parameters 
     cameras = {}
 
     with open(path, "r") as f:

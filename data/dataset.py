@@ -20,17 +20,21 @@ from PIL import Image, ImageDraw
 import random
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, transform):
-        self.root_path = '../data/data'
-        self.depthmap_root_path = '../data/depthmap'
+    def __init__(self, transform, mode):
+        self.mode = mode
+        self.img_path = '../data/images/subject_' + cfg.subject
+        self.annot_path = '../data/annotations'
         self.hand_model_path = '../data/hand_model'
-
-        self.sequence_names = glob(osp.join(self.root_path, '*RT*')) # hand v2. RT: right single hand, LT: left single hand, DH: double hands
+        
+        if cfg.subject == '1':
+            self.sequence_names = glob(osp.join(self.img_path, '00*')) # 00: right single hand, 01: left single hand, 02: double hands
+        else:
+            self.sequence_names = glob(osp.join(self.img_path, '*RT*')) # RT: right single hand, LT: left single hand, DH: double hands
         self.sequence_names = [name for name in self.sequence_names if osp.isdir(name)]
         self.sequence_names = [name for name in self.sequence_names if 'ROM' not in name] # 'ROM' exclude in training
         self.sequence_names = [x.split('/')[-1] for x in self.sequence_names]
 
-        self.krt_path = osp.join(self.root_path, 'KRT') # camera parameters
+        self.krt_path = osp.join(self.annot_path, 'KRT_512') # camera parameters
 
         self.obj_file_path = osp.join(self.hand_model_path, 'hand.obj')
         self.template_skeleton_path = osp.join(self.hand_model_path, 'skeleton.txt')
@@ -44,7 +48,7 @@ class Dataset(torch.utils.data.Dataset):
         self.align_joint_idx = [8, 12, 16, 20, 21]
         self.non_rigid_joint_idx = [3,21]
 
-        self.original_img_shape = (512, 334) # downsized from (4096, 2668). (height, width)
+        self.original_img_shape = (512, 334) # height, width 
         self.transform = transform
         
         # load template mesh things
@@ -59,7 +63,7 @@ class Dataset(torch.utils.data.Dataset):
         krt = load_krt(self.krt_path)
         self.all_cameras = krt.keys()
         self.selected_cameras = [x for x in self.all_cameras if x[:2] == "40"] # 40xx cameras: color cameras
- 
+        
         # compute view directions of each camera
         campos = {}
         camrot = {}
@@ -69,8 +73,8 @@ class Dataset(torch.utils.data.Dataset):
             campos[cam] = -np.dot(krt[cam]['extrin'][:3, :3].T, krt[cam]['extrin'][:3, 3]).astype(np.float32)
             camrot[cam] = np.array(krt[cam]['extrin'][:3, :3]).astype(np.float32)
             focal[cam] = krt[cam]['intrin'][:2, :2]
-            focal[cam] = np.array([focal[cam][0][0], focal[cam][1][1]]).astype(np.float32) / 8 # downsized from 4K to 512
-            princpt[cam] = np.array(krt[cam]['intrin'][:2, 2]).astype(np.float32) / 8 # downsized from 4K to 512
+            focal[cam] = np.array([focal[cam][0][0], focal[cam][1][1]]).astype(np.float32)
+            princpt[cam] = np.array(krt[cam]['intrin'][:2, 2]).astype(np.float32) 
         self.campos = campos
         self.camrot = camrot
         self.focal = focal
@@ -79,30 +83,28 @@ class Dataset(torch.utils.data.Dataset):
         # get info for all frames
         self.framelist = []
         for seq_name in self.sequence_names:
-            frameinfo = []
-            with open(osp.join(self.root_path, seq_name,'frame')) as f:
-                frameinfo = f.readline().split()
-            start_frame = int(frameinfo[2])
-            end_frame = int(frameinfo[3])
-            frame_interval = int(frameinfo[4])
             for cam in self.selected_cameras:
-                for frame_idx in range(start_frame, end_frame+1, frame_interval):
-                   
-                    # load joint world coordinates
-                    joint_path = osp.join(self.root_path, seq_name, 'keypoints', '3D', 'image' + "{:04d}".format(frame_idx) + '.pts')
-                    joint_coord, joint_valid = self.load_joint_coord(joint_path, 'right', self.mesh.skeleton)
+                img_path_list = glob(osp.join(self.img_path, seq_name, 'cam' + cam, '*.jpg'))
+                for img_path in img_path_list:
+                    frame_idx = int(img_path.split('/')[-1][5:-4])
+
+                    # load joint 3D world coordinates
+                    joint_path = osp.join(self.annot_path, 'keypoints', 'subject_' + cfg.subject, "keypoints{:04d}".format(frame_idx) + '.pts')
+                    if osp.isfile(joint_path):
+                        joint_coord, joint_valid = self.load_joint_coord(joint_path, 'right', self.mesh.skeleton) # only use right hand
+                    else:
+                        continue
        
                     joint = {'world_coord': joint_coord, 'valid': joint_valid}
-                    frame = {'seq_name': seq_name, 'cam': cam, 'frame_idx': frame_idx, 'joint': joint}
+                    frame = {'img_path': img_path, 'seq_name': seq_name, 'cam': cam, 'frame_idx': frame_idx, 'joint': joint}
                     self.framelist.append(frame)
-
 
     def __len__(self):
         return len(self.framelist)
     
     def __getitem__(self, idx):
         frame = self.framelist[idx]
-        seq_name, cam, frame_idx, joint = frame['seq_name'], frame['cam'], frame['frame_idx'], frame['joint']
+        img_path, cam, frame_idx, joint = frame['img_path'], frame['cam'], frame['frame_idx'], frame['joint']
         joint_coord, joint_valid = joint['world_coord'], joint['valid']
        
         # input data
@@ -113,7 +115,6 @@ class Dataset(torch.utils.data.Dataset):
         bbox = np.array([xmin, ymin, xmax, ymax])
         
         # image read
-        img_path = osp.join(self.root_path, seq_name, 'images', 'cam' + cam, 'image' + "{:04d}".format(frame_idx) + '.png')
         img = load_img(img_path)
         xmin, ymin, xmax, ymax = bbox
         xmin, xmax = np.array([xmin, xmax])/self.original_img_shape[1]*img.shape[1]; ymin, ymax = np.array([ymin, ymax])/self.original_img_shape[0]*img.shape[0]
@@ -131,7 +132,7 @@ class Dataset(torch.utils.data.Dataset):
             bbox = np.array([xmin, ymin, xmax, ymax])
 
             # depthmap read
-            depthmap_path = osp.join(self.depthmap_root_path, "{:06d}".format(frame_idx), 'depthmap' + cam + '.pkl')
+            depthmap_path = osp.join(self.annot_path, 'depthmaps', 'subject_' + cfg.subject, "{:06d}".format(frame_idx), 'depthmap' + cam + '.pkl')
             with open(depthmap_path,'rb') as f:
                 depthmap = pickle.load(f).astype(np.float32)
             xmin, ymin, xmax, ymax = bbox
@@ -153,8 +154,8 @@ class Dataset(torch.utils.data.Dataset):
     def load_joint_coord(self, joint_path, hand_type, skeleton):
 
         # create link between (joint_index in file, joint_name)
-        # all the codes use joint index and name of 'skeleton'
-        db_joint_name = ['b_r_thumb_null', 'b_r_thumb3', 'b_r_thumb2', 'b_r_thumb1', 'b_r_index_null', 'b_r_index3', 'b_r_index2', 'b_r_index1', 'b_r_middle_null', 'b_r_middle3', 'b_r_middle2', 'b_r_middle1', 'b_r_ring_null', 'b_r_ring3', 'b_r_ring2', 'b_r_ring1', 'b_r_pinky_null', 'b_r_pinky3', 'b_r_pinky2', 'b_r_pinky1', 'b_r_wrist']
+        # all the codes use joint index and name of 'skeleton.txt'
+        db_joint_name = ['b_r_thumb_null', 'b_r_thumb3', 'b_r_thumb2', 'b_r_thumb1', 'b_r_index_null', 'b_r_index3', 'b_r_index2', 'b_r_index1', 'b_r_middle_null', 'b_r_middle3', 'b_r_middle2', 'b_r_middle1', 'b_r_ring_null', 'b_r_ring3', 'b_r_ring2', 'b_r_ring1', 'b_r_pinky_null', 'b_r_pinky3', 'b_r_pinky2', 'b_r_pinky1', 'b_r_wrist'] # joint names of 'keypointst****.pts'
 
         # load 3D world coordinates of joints
         joint_world = np.ones((len(skeleton),3),dtype=np.float32)
@@ -172,7 +173,7 @@ class Dataset(torch.utils.data.Dataset):
                     continue
      
                 joint_name = db_joint_name[joint_idx]
-                joint_idx = [i for i,_ in enumerate(skeleton) if _['name'] == joint_name][0] # joint_idx which follows my 'skeleton'
+                joint_idx = [i for i,_ in enumerate(skeleton) if _['name'] == joint_name][0] # joint_idx which follows 'skeleton.txt'
                
                 joint_world[joint_idx] = np.array([x_world, y_world, z_world], dtype=np.float32)
                 joint_valid[joint_idx] = 1

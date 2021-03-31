@@ -78,7 +78,7 @@ class Trainer(Base):
     def _make_batch_generator(self):
         # data load and construct batch generator
         self.logger.info("Creating dataset...")
-        trainset_loader = Dataset(transforms.ToTensor())
+        trainset_loader = Dataset(transforms.ToTensor(), 'train')
         batch_generator = DataLoader(dataset=trainset_loader, batch_size=cfg.num_gpus*cfg.train_batch_size, shuffle=True, num_workers=cfg.num_thread, pin_memory=True)
 
         self.mesh = trainset_loader.mesh
@@ -134,7 +134,7 @@ class Tester(Base):
     def _make_batch_generator(self):
         # data load and construct batch generator
         self.logger.info("Creating dataset...")
-        testset_loader = Dataset(transforms.ToTensor())
+        testset_loader = Dataset(transforms.ToTensor(), 'test')
         batch_generator = DataLoader(dataset=testset_loader, batch_size=cfg.num_gpus*cfg.test_batch_size, shuffle=False, num_workers=cfg.num_thread, pin_memory=True)
 
         self.mesh = testset_loader.mesh

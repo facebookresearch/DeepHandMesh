@@ -15,6 +15,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=str, dest='gpu_ids')
     parser.add_argument('--continue', dest='continue_train', action='store_true')
+    parser.add_argument('--subject', type=str, dest='subject')
     args = parser.parse_args()
 
     if not args.gpu_ids:
@@ -25,14 +26,16 @@ def parse_args():
         gpus[0] = int(gpus[0])
         gpus[1] = int(gpus[1]) + 1
         args.gpu_ids = ','.join(map(lambda x: str(x), list(range(*gpus))))
-
+    
+    assert args.subject, 'Training subject is required'
+    assert args.subject == '4', 'Training only supports subject_4'
     return args
 
 def main():
     
     # argument parse and create log
     args = parse_args()
-    cfg.set_args(args.gpu_ids, args.continue_train)
+    cfg.set_args(args.subject, args.gpu_ids, args.continue_train)
     cudnn.benchmark = True
 
     trainer = Trainer()
