@@ -14,7 +14,7 @@ This repo is official **[PyTorch](https://pytorch.org)** implementation of **[De
 * Set hand joint Euler angles at [here](https://github.com/facebookresearch/DeepHandMesh/blob/508119e288ef35d4160043e5d3d174d2bf0d1873/demo/demo.py#L73).
 * Run `python demo.py --gpu 0 --subject ${SUBJECT_IDX} --test_epoch ${EPOCH}`.
 
-## DeepHandMesh dataset (RGB images are not prepared yet)
+## DeepHandMesh dataset
 * For the **DeepHandMesh dataset download and instructions**, go to [[HOMEPAGE](https://mks0601.github.io/DeepHandMesh/)]. 
 * Belows are instructions for DeepHandMesh for the weakly-supervised high-fidelity 3D hand mesh modeling.
 
