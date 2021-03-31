@@ -8,10 +8,11 @@
 This repo is official **[PyTorch](https://pytorch.org)** implementation of **[DeepHandMesh: A Weakly-Supervised Deep Encoder-Decoder Framework for High-Fidelity Hand Mesh Modeling (ECCV 2020. Oral.)](https://arxiv.org/abs/2008.08213)**. 
 
 ## Demo
-* Download pre-trained DeepHandMesh from [here](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing) and place it at `demo` folder, where the filename is `snapshot_${EPOCH}.pth.tar`.
+* Download pre-trained DeepHandMesh from [here](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing).
+* Place the downloaded file at `demo/subject_${SUBJECT_IDX}` folder, where the filename is `snapshot_${EPOCH}.pth.tar`.
 * Download hand model from [here](https://drive.google.com/file/d/1GTtkyuuIHbo188L0_d8DAmuJukoG-luJ/view?usp=sharing) and place it at `data` folder.
 * Set hand joint Euler angles at [here](https://github.com/facebookresearch/DeepHandMesh/blob/508119e288ef35d4160043e5d3d174d2bf0d1873/demo/demo.py#L73).
-* Run `python demo.py --gpu 0 --test_epoch ${EPOCH}`.
+* Run `python demo.py --gpu 0 --subject ${SUBJECT_IDX} --test_epoch ${EPOCH}`.
 
 ## DeepHandMesh dataset (RGB images are not prepared yet)
 * For the **DeepHandMesh dataset download and instructions**, go to [[HOMEPAGE](https://mks0601.github.io/DeepHandMesh/)]. 
@@ -39,7 +40,24 @@ You need to follow directory structure of the `data` as below.
 ```
 ${ROOT}
 |-- data
+|   |-- images
+|   |   |-- subject_1
+|   |   |-- subject_2
+|   |   |-- subject_3
+|   |   |-- subject_4
+|   |-- annotations
+|   |   |-- 3D_scans_decimated
+|   |   |-- depthmaps
+|   |   |-- keypoints
+|   |   |-- KRT_512
 |   |-- hand_model
+|   |   |-- global_pose.txt
+|   |   |-- global_pose_inv.txt
+|   |   |-- hand.fbx
+|   |   |-- hand.obj
+|   |   |-- local_pose.txt
+|   |   |-- skeleton.txt
+|   |   |-- skinning_weight.txt
 ```
 * Download datasets and hand model from [[HOMEPAGE](https://mks0601.github.io/DeepHandMesh/)]. 
 
@@ -70,9 +88,10 @@ ${ROOT}
 ### Train
 In the `main` folder, run
 ```bash
-python train.py --gpu 0-3
+python train.py --gpu 0-3 --subject 4
 ```
 to train the network on the GPU 0,1,2,3. `--gpu 0,1,2,3` can be used instead of `--gpu 0-3`. You can use `--continue` to resume the training.
+Only subject 4 is supported for the training.
 
 
 ### Test
@@ -80,9 +99,10 @@ Place trained model at the `output/model_dump/`.
 
 In the `main` folder, run 
 ```bash
-python test.py --gpu 0-3 --test_epoch 4
+python test.py --gpu 0-3 --test_epoch 4 --subject 4
 ```
 to test the network on the GPU 0,1,2,3 with `snapshot_4.pth.tar`. `--gpu 0,1,2,3` can be used instead of `--gpu 0-3`.  
+Only subject 4 is supported for the testing.
 
 ## Results  
 Here I report results of DeepHandMesh and pre-trained DeepHandMesh.
