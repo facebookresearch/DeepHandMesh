@@ -47,8 +47,11 @@ ${ROOT}
 |   |   |-- subject_4
 |   |-- annotations
 |   |   |-- 3D_scans_decimated
+|   |   |   |-- subject_4
 |   |   |-- depthmaps
+|   |   |   |-- subject_4
 |   |   |-- keypoints
+|   |   |   |-- subject_4
 |   |   |-- KRT_512
 |   |-- hand_model
 |   |   |-- global_pose.txt
