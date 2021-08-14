@@ -120,8 +120,14 @@ class Model(nn.Module):
                 rendered_depthmap_refined = self.renderer(mesh_out_refined, cam_param[cid], affine_trans[cid], mesh)
                 depthmap_out_refined.append(rendered_depthmap_refined)
             
+            # zero pose template mesh with correctives (for penet loss and test output) 
+            joint_trans_mat = torch.bmm(mesh['global_pose_refined'], mesh['global_pose_inv'])[:,None,:,:].repeat(1,batch_size,1,1)
+            mesh_refined_v = mesh['v'] + pose_corrective + id_corrective
+            mesh_refined_v = torch.cat([mesh_refined_v, torch.ones_like(mesh_refined_v[:,:,:1])],2)
+            mesh_refined_v = sum([mesh['skinning_weight'][:,:,j,None]*torch.bmm(joint_trans_mat[j],mesh_refined_v.permute(0,2,1)).permute(0,2,1)[:,:,:3] for j in range(self.joint_num)])
+
             loss = {}
-            loss['joint'] = self.joint_loss(joint_out, target_joint, targets['joint']['valid'])
+            loss['joint'] = self.joint_loss(joint_out, targets['joint']['world_coord'], targets['joint']['valid'])
             loss['depthmap'] = self.depthmap_loss(depthmap_out_refined, targets['depthmap'])
             loss['penet'] = self.penet_loss(mesh['global_pose_refined'].detach(), mesh_refined_v.detach(), joint_out, mesh_out_refined)
             loss['lap'] = self.lap_loss(mesh_out_refined) * cfg.loss_lap_weight
