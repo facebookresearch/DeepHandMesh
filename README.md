@@ -8,9 +8,9 @@
 This repo is official **[PyTorch](https://pytorch.org)** implementation of **[DeepHandMesh: A Weakly-Supervised Deep Encoder-Decoder Framework for High-Fidelity Hand Mesh Modeling (ECCV 2020. Oral.)](https://arxiv.org/abs/2008.08213)**. 
 
 ## Demo
-* Download pre-trained DeepHandMesh from [here](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing).
+* Download pre-trained DeepHandMesh from [here](https://drive.google.com/drive/folders/1bNq3syXTnzEs2jTGBANzv3sDi7Cpp46S?usp=sharing).
 * Place the downloaded file at `demo/subject_${SUBJECT_IDX}` folder, where the filename is `snapshot_${EPOCH}.pth.tar`.
-* Download hand model from [here](https://drive.google.com/file/d/1GTtkyuuIHbo188L0_d8DAmuJukoG-luJ/view?usp=sharing) and place it at `data` folder.
+* Download hand model from [here](https://drive.google.com/file/d/1LjQ-rbWrXj1lcp2we00hMJdeMwMLIXus/view?usp=sharing) and place it at `data` folder.
 * Set hand joint Euler angles at [here](https://github.com/facebookresearch/DeepHandMesh/blob/508119e288ef35d4160043e5d3d174d2bf0d1873/demo/demo.py#L73).
 * Run `python demo.py --gpu 0 --subject ${SUBJECT_IDX} --test_epoch ${EPOCH}`.
 
@@ -112,7 +112,7 @@ It will save images and output meshes.
 Here I report results of DeepHandMesh and pre-trained DeepHandMesh.
 
 ### Pre-trained DeepHandMesh
-* Pre-trained DeepHandMesh [[Download](https://drive.google.com/drive/folders/1V4pY9bcmmPqsDW-4yj62ATCT7JdEz_5p?usp=sharing)]
+* Pre-trained DeepHandMesh [[Download](https://drive.google.com/drive/folders/1bNq3syXTnzEs2jTGBANzv3sDi7Cpp46S?usp=sharing)]
 
 ### Effect of Identity- and Pose-Dependent Correctives
 <p align="center">  
