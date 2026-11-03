@@ -114,7 +114,7 @@ class Trainer(Base):
         cur_epoch = max([int(file_name[file_name.find('snapshot_') + 9 : file_name.find('.pth.tar')]) for file_name in model_file_list])
         model_path = osp.join(cfg.model_dir, 'snapshot_' + str(cur_epoch) + '.pth.tar')
         self.logger.info('Load checkpoint from {}'.format(model_path))
-        ckpt = torch.load(model_path)
+        ckpt = torch.load(model_path, weights_only=True)
         start_epoch = ckpt['epoch'] + 1
 
         model.load_state_dict(ckpt['network'], strict=False)
@@ -152,7 +152,7 @@ class Tester(Base):
         self.logger.info("Creating graph...")
         model = get_model('test', self.mesh, self.root_joint_idx, self.align_joint_idx, self.non_rigid_joint_idx)
         model = DataParallel(model).cuda()
-        ckpt = torch.load(model_path)
+        ckpt = torch.load(model_path, weights_only=True)
         model.load_state_dict(ckpt['network'], strict=False)
         model.eval()
 
