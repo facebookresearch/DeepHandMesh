@@ -67,7 +67,7 @@ model_path = './subject_' + args.subject + '/snapshot_' + args.test_epoch + '.pt
 assert os.path.exists(model_path), 'Cannot find model at ' + model_path
 model = get_model('test', mesh, root_joint_idx, align_joint_idx, non_rigid_joint_idx)
 model = DataParallel(model).cuda()
-ckpt = torch.load(model_path)
+ckpt = torch.load(model_path, weights_only=True)
 model.load_state_dict(ckpt['network'], strict=False)
 model.eval()
 
